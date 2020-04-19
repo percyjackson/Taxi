@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using Taxi.Web.Data;
 using Taxi.Web.Data.Entities;
 
@@ -54,10 +51,11 @@ namespace Taxi.Web.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Plaque")] TaxiEntity taxiEntity)
+        public async Task<IActionResult> Create(TaxiEntity taxiEntity)
         {
             if (ModelState.IsValid)
             {
+                taxiEntity.Plaque = taxiEntity.Plaque.ToUpper();
                 _context.Add(taxiEntity);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -86,7 +84,7 @@ namespace Taxi.Web.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Plaque")] TaxiEntity taxiEntity)
+        public async Task<IActionResult> Edit(int id, TaxiEntity taxiEntity)
         {
             if (id != taxiEntity.Id)
             {
@@ -97,6 +95,7 @@ namespace Taxi.Web.Controllers
             {
                 try
                 {
+                    taxiEntity.Plaque = taxiEntity.Plaque.ToUpper();
                     _context.Update(taxiEntity);
                     await _context.SaveChangesAsync();
                 }
@@ -131,15 +130,6 @@ namespace Taxi.Web.Controllers
                 return NotFound();
             }
 
-            return View(taxiEntity);
-        }
-
-        // POST: Taxis/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var taxiEntity = await _context.Taxis.FindAsync(id);
             _context.Taxis.Remove(taxiEntity);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
